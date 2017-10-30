@@ -34,7 +34,7 @@ module.exports = function(RED) {
         'else': function(a) { return a === true; }
     };
 
-    function SwitchNode(n) {
+    function VarsNode(n) {
         RED.nodes.createNode(this, n);
         this.rules = n.rules || [];
         this.property = n.property;
@@ -44,7 +44,7 @@ module.exports = function(RED) {
             try {
                 this.property = RED.util.prepareJSONataExpression(this.property,this);
             } catch(err) {
-                this.error(RED._("switch.errors.invalid-expr",{error:err.message}));
+                this.error(RED._("vars.errors.invalid-expr",{error:err.message}));
                 return;
             }
         }
@@ -70,7 +70,7 @@ module.exports = function(RED) {
                 try {
                     rule.v = RED.util.prepareJSONataExpression(rule.v,node);
                 } catch(err) {
-                    this.error(RED._("switch.errors.invalid-expr",{error:err.message}));
+                    this.error(RED._("vars.errors.invalid-expr",{error:err.message}));
                     valid = false;
                 }
             }
@@ -88,7 +88,7 @@ module.exports = function(RED) {
                     try {
                         rule.v2 = RED.util.prepareJSONataExpression(rule.v2,node);
                     } catch(err) {
-                        this.error(RED._("switch.errors.invalid-expr",{error:err.message}));
+                        this.error(RED._("vars.errors.invalid-expr",{error:err.message}));
                         valid = false;
                     }
                 }
@@ -119,7 +119,7 @@ module.exports = function(RED) {
                         try {
                             v1 = RED.util.evaluateJSONataExpression(rule.v,msg);
                         } catch(err) {
-                            node.error(RED._("switch.errors.invalid-expr",{error:err.message}));
+                            node.error(RED._("vars.errors.invalid-expr",{error:err.message}));
                             return;
                         }
                     } else {
@@ -136,7 +136,7 @@ module.exports = function(RED) {
                         try {
                             v2 = RED.util.evaluateJSONataExpression(rule.v2,msg);
                         } catch(err) {
-                            node.error(RED._("switch.errors.invalid-expr",{error:err.message}));
+                            node.error(RED._("vars.errors.invalid-expr",{error:err.message}));
                             return;
                         }
                     } else if (typeof v2 !== 'undefined') {
@@ -162,5 +162,5 @@ module.exports = function(RED) {
             }
         });
     }
-    RED.nodes.registerType("vars", SwitchNode);
+    RED.nodes.registerType("vars", VarsNode);
 }
