@@ -1,0 +1,37 @@
+{
+  "name": "node-red-contrib-canzea-elasticsearch",
+  "version": "0.0.4",
+  "description": "A set of Node-RED nodes for Elasticsearch including search, get, exists, create, update and delete.A Fork from @jeffdonthemic node-red-contrib-elasticsearch-jd",
+  "author": {
+    "name": "Ike the Coder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikethecoder/node-red-contrib-canzea-elasticsearch.git"
+  },
+  "keywords": [
+    "node-red",
+    "elasticsearch"
+  ],
+  "node-red": {
+    "nodes": {
+      "search": "search.js",
+      "create": "create.js",
+      "exists": "exists.js",
+      "update": "update.js",
+      "delete": "delete.js",
+      "get": "get.js",
+      "remote-server": "remote-server.js"
+    }
+  },
+  "license": "MIT",
+  "dependencies": {
+    "elasticsearch": ">=10.1.2"
+  },
+  "maintainers": [
+    {
+      "name": "ikethecoder",
+      "email": "ikethecoder@canzea.com"
+    }
+  ]
+}
