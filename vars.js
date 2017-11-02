@@ -222,8 +222,12 @@ module.exports = function(RED) {
 
             var promises = [];
             try {
-                msg.envs = {};
-                msg.missing = [];
+                if (msg.hasOwnProperty('envs') == false) {
+                    msg.envs = {};
+                }
+                if (msg.hasOwnProperty('missing') == false) {
+                    msg.missing = {};
+                }
 
                 var urls = [];
                 for (var i=0; i<node.rules.length; i+=1) {
