@@ -20,6 +20,22 @@ var async = require('async');
 module.exports = function(RED) {
     "use strict";
 
+    var operators = {
+        'eq': function(a, b) { return a == b; },
+        'neq': function(a, b) { return a != b; },
+        'lt': function(a, b) { return a < b; },
+        'lte': function(a, b) { return a <= b; },
+        'gt': function(a, b) { return a > b; },
+        'gte': function(a, b) { return a >= b; },
+        'btwn': function(a, b, c) { return a >= b && a <= c; },
+        'cont': function(a, b) { return (a + "").indexOf(b) != -1; },
+        'regex': function(a, b, c, d) { return (a + "").match(new RegExp(b,d?'i':'')); },
+        'true': function(a) { return a === true; },
+        'false': function(a) { return a === false; },
+        'null': function(a) { return (typeof a == "undefined" || a === null); },
+        'nnull': function(a) { return (typeof a != "undefined" && a !== null); },
+        'else': function(a) { return a === true; }
+    };
 
     function doRequest (node, msg, url, tlsNode, callback) {
 
@@ -86,7 +102,7 @@ module.exports = function(RED) {
               }
 
               if (response.statusCode != 200) {
-                  msg.missing.push(rule.v);
+                  msg.missing.push(rule.cv + ':' + rule.v);
               } else {
                   if (rule.t == "keyvalue") {
 
@@ -226,13 +242,18 @@ module.exports = function(RED) {
                     msg.envs = {};
                 }
                 if (msg.hasOwnProperty('missing') == false) {
-                    msg.missing = {};
+                    msg.missing = [];
                 }
 
                 var urls = [];
                 for (var i=0; i<node.rules.length; i+=1) {
                     var rule = node.rules[i];
 
+                    var v = evalValue(node, rule, msg);
+                    node.debug("vars : " + rule.v + " -> " + v + " : " + JSON.stringify(rule));
+
+                    rule.cv = rule.v;
+                    rule.v = v;
                     urls.push({"url":n.url, "rule":rule});
                 }
 
@@ -248,6 +269,28 @@ module.exports = function(RED) {
 
 
 
+    }
+
+    function evalValue (node, rule, msg) {
+        var v1,v2;
+        if (rule.vt === 'prev') {
+            v1 = node.previousValue;
+        } else if (rule.vt === 'jsonata') {
+            try {
+                v1 = RED.util.evaluateJSONataExpression(rule.v,msg);
+            } catch(err) {
+                node.error(RED._("switch.errors.invalid-expr",{error:err.message}));
+                return;
+            }
+        } else {
+            try {
+                v1 = RED.util.evaluateNodeProperty(rule.v,rule.vt,node,msg);
+            } catch(err) {
+                node.error(RED._("switch.errors.invalid-property",{error:err.message}));
+                v1 = undefined;
+            }
+        }
+        return v1;
     }
     RED.nodes.registerType("vars", VarsNode);
 }
