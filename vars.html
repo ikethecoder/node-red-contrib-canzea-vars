@@ -36,10 +36,6 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="vars">
-    <p>Set property values.</p>
-    <h3>Details</h3>
-</script>
 
 <script type="text/javascript">
 (function() {
@@ -67,7 +63,6 @@
         category: 'function',
         defaults: {
             name: {value:""},
-            property: {value:"payload", required:true, validate: RED.validators.typedInput("propertyType")},
             propertyType: { value:"msg" },
             rules: {value:[{t:"secret", v:""}]},
             checkall: {value:"true", required:true},
