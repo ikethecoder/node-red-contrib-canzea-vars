@@ -44,7 +44,7 @@ module.exports = function(RED) {
             timeout: node.reqTimeout,
             followRedirect: false,
             headers: {
-                "X-Vault-Token": process.env.VAULT_TOKEN
+                "X-Vault-Token": msg.req.headers['X-Vault-Token']
             }
         };
 
