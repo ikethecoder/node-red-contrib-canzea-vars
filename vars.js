@@ -43,11 +43,17 @@ module.exports = function(RED) {
             method: 'GET',
             timeout: node.reqTimeout,
             followRedirect: false,
-            headers: {
-                "X-Vault-Token": msg.req.headers['x-vault-token']
-            }
+            headers: {}
         };
 
+        if (msg.req && msg.req.headers.hasOwnProperty('x-vault-token')) {
+            opts.headers['X-Vault-Token'] = msg.req.headers['x-vault-token']
+        }
+
+        if (msg.req && msg.req.headers.hasOwnProperty('x-tenant-id')) {
+            opts.headers['X-Tenant-ID'] = msg.req.headers['x-tenant-id']
+        }
+        
         var rule = url.rule;
 
         if (rule.t == "keyvalue") {
