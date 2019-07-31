@@ -167,8 +167,7 @@ module.exports = function(RED) {
                       });
                   }
                   callback();
-                }
-              //node.warn("Finished request for " + rule.v);
+              }
             }
         });
 
@@ -250,7 +249,6 @@ module.exports = function(RED) {
                 text: "Requesting"
             });
 
-            var promises = [];
             try {
                 if (msg.hasOwnProperty('envs') == false) {
                     msg.envs = {};
@@ -259,12 +257,7 @@ module.exports = function(RED) {
                     msg.missing = [];
                 }
 
-                node.warn("VAULT_URI = " + nconf.get("VAULT_URI"));
-                node.warn("n.url = " + n.url);
-
                 var baseUrl = (typeof n.url === "undefined" || n.url == "") ? nconf.get("VAULT_URI") : n.url;
-
-                node.warn("baseURL = " + baseUrl);
 
                 var urls = [];
                 for (var i=0; i<node.rules.length; i+=1) {
