@@ -22,7 +22,8 @@
   "license": "MIT",
   "dependencies": {
     "request": "2.80.0",
-    "async": "2.5.0"
+    "async": "2.5.0",
+    "nconf": "0.8.4"
   },
   "maintainers": [
     {

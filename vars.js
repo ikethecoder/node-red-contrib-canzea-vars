@@ -16,9 +16,13 @@
 
 var request = require('request');
 var async = require('async');
+var nconf = require('nconf');
+
 
 module.exports = function(RED) {
     "use strict";
+
+    nconf.defaults({VAULT_URI: ""}).env();
 
     var operators = {
         'eq': function(a, b) { return a == b; },
@@ -251,6 +255,8 @@ module.exports = function(RED) {
                     msg.missing = [];
                 }
 
+                var baseUrl = (typeof n.url === "undefined" || n.url == "") ? nconf.get("VAULT_URI") : n.url;
+
                 var urls = [];
                 for (var i=0; i<node.rules.length; i+=1) {
                     var rule = node.rules[i];
@@ -260,7 +266,7 @@ module.exports = function(RED) {
 
                     rule.cv = rule.v;
                     rule.v = v;
-                    urls.push({"url":n.url, "rule":rule});
+                    urls.push({"url":baseUrl, "rule":rule});
                 }
 
                 async.each(urls, function (url, callback) {
