@@ -278,7 +278,12 @@ module.exports = function(RED) {
                 async.each(urls, function (url, callback) {
                     doRequest (node, msg, url, tlsNode, callback);
                 }, function (err) {
-                    node.error("Async catch error - " + err);
+                    if (err) {
+                        node.error("Async catch error - " + err);
+                    } else {
+                        node.warn("Done getting requests");
+                        node.send(msg);
+                    }
                 });
             } catch(err) {
                 node.error("Catch all error - " + err);
@@ -298,17 +303,18 @@ module.exports = function(RED) {
                 v1 = RED.util.evaluateJSONataExpression(rule.v,msg);
             } catch(err) {
                 node.error(RED._("switch.errors.invalid-expr",{error:err.message}));
-                return;
+                throw new Error('Parsing Invalid Expr Error');
             }
         } else {
             try {
                 v1 = RED.util.evaluateNodeProperty(rule.v,rule.vt,node,msg);
             } catch(err) {
                 node.error(RED._("switch.errors.invalid-property",{error:err.message}));
-                v1 = undefined;
+                throw new Error('Parsing Node Property Error');
             }
         }
         return v1;
     }
+
     RED.nodes.registerType("vars", VarsNode);
 }
