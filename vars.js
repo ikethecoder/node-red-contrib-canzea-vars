@@ -18,11 +18,12 @@ var request = require('request');
 var async = require('async');
 var nconf = require('nconf');
 
+var VAULT_URI = process.env.VAULT_URI;
 
 module.exports = function(RED) {
     "use strict";
 
-    nconf.defaults({VAULT_URI: ""}).env().argv();
+    nconf.defaults({VAULT_URI: VAULT_URI}).env().argv();
 
     var operators = {
         'eq': function(a, b) { return a == b; },
@@ -79,7 +80,7 @@ module.exports = function(RED) {
 
             if (error) {
               if (error.code === 'ETIMEDOUT') {
-                node.error(RED._("common.notification.errors.no-response"), msg);
+                //node.error(RED._("common.notification.errors.no-response"), msg);
                 setTimeout(function () {
                   node.status({
                     fill: "red",
@@ -88,7 +89,7 @@ module.exports = function(RED) {
                   });
                 }, 10);
               } else {
-                node.error(error, msg);
+                //node.error(error, msg);
                 //msg.payload = error.toString() + " : " + url;
                 //msg.statusCode = error.code;
                 setTimeout(function () {
@@ -99,7 +100,7 @@ module.exports = function(RED) {
                     });
                 }, 10);                
               }
-              callback("Error getting data");
+              callback("Error " + rule.v + " - " + error);
             } else {
 
               if (node.metric()) {
@@ -281,9 +282,9 @@ module.exports = function(RED) {
                     doRequest (node, msg, url, tlsNode, callback);
                 }, function (err) {
                     if (err) {
-                        node.error("Async catch error - " + err);
+                        node.error("One or more failures - " + err, msg);
                     } else {
-                        node.warn("Done getting requests");
+                        node.warn("Success getting requests");
                         node.send(msg);
                     }
                 });
