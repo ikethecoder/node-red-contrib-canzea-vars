@@ -249,45 +249,37 @@ module.exports = function(RED) {
                 text: "Requesting"
             });
 
-            try {
-                if (msg.hasOwnProperty('envs') == false) {
-                    msg.envs = {};
-                }
-                if (msg.hasOwnProperty('missing') == false) {
-                    msg.missing = [];
-                }
-
-                var baseUrl = (typeof n.url === "undefined" || n.url == "") ? nconf.get("VAULT_URI") : n.url;
-
-                var urls = [];
-                for (var i=0; i<node.rules.length; i+=1) {
-                    var rule = node.rules[i];
-
-                    var v = evalValue(node, rule, msg);
-                    node.debug("vars : " + rule.v + " -> " + v + " : " + JSON.stringify(rule));
-
-                    rule.cv = rule.v;
-                    rule.v = v;
-                    urls.push({"url":baseUrl, "rule":rule});
-                }
-
-                async.each(urls, function (url, callback) {
-                    doRequest (node, msg, url, tlsNode, callback);
-                }, function (err) {
-                    if (err) {
-                        node.error("One or more failures - " + err, msg);
-                    } else {
-                        node.warn("Success getting requests");
-                        node.send(msg);
-                    }
-                });
-            } catch(err) {
-                node.error("Catch all error - " + err);
+            if (msg.hasOwnProperty('envs') == false) {
+                msg.envs = {};
             }
+            if (msg.hasOwnProperty('missing') == false) {
+                msg.missing = [];
+            }
+
+            var baseUrl = (typeof n.url === "undefined" || n.url == "") ? nconf.get("VAULT_URI") : n.url;
+
+            var urls = [];
+            for (var i=0; i<node.rules.length; i+=1) {
+                var rule = node.rules[i];
+
+                var v = evalValue(node, rule, msg);
+                node.debug("vars : " + rule.v + " -> " + v + " : " + JSON.stringify(rule));
+
+                rule.cv = rule.v;
+                rule.v = v;
+                urls.push({"url":baseUrl, "rule":rule});
+            }
+
+            async.each(urls, function (url, callback) {
+                doRequest (node, msg, url, tlsNode, callback);
+            }, function (err) {
+                if (err) {
+                    node.error("One or more failures - " + err, msg);
+                } else {
+                    node.send(msg);
+                }
+            });
         });
-
-
-
     }
 
     function evalValue (node, rule, msg) {
