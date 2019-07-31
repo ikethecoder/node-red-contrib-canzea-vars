@@ -22,7 +22,7 @@ var nconf = require('nconf');
 module.exports = function(RED) {
     "use strict";
 
-    nconf.defaults({VAULT_URI: ""}).env();
+    nconf.defaults({VAULT_URI: ""}).env().argv();
 
     var operators = {
         'eq': function(a, b) { return a == b; },
@@ -61,11 +61,11 @@ module.exports = function(RED) {
         var rule = url.rule;
 
         if (rule.t == "keyvalue") {
-            opts['url'] = url.url + "/v1/kv/" + rule.v;
+            opts['url'] = url.url + "v1/kv/" + rule.v;
         } else if (rule.t == "service") {
-            opts['url'] = url.url + "/v1/catalog/service/" + rule.v;
+            opts['url'] = url.url + "v1/catalog/service/" + rule.v;
         } else {
-            opts['url'] = url.url + "/v1/secret/" + rule.v;
+            opts['url'] = url.url + "v1/secret/" + rule.v;
         }
 
         node.debug("CALLING: " + opts['url']);
@@ -91,11 +91,13 @@ module.exports = function(RED) {
                 node.error(error, msg);
                 //msg.payload = error.toString() + " : " + url;
                 //msg.statusCode = error.code;
-                node.status({
-                  fill: "red",
-                  shape: "ring",
-                  text: "Error - " + error.statusCode
-                });
+                setTimeout(function () {
+                    node.status({
+                        fill: "red",
+                        shape: "ring",
+                        text: "Error - " + error.code
+                    });
+                }, 10);                
               }
             } else {
 
@@ -254,7 +256,12 @@ module.exports = function(RED) {
                     msg.missing = [];
                 }
 
+                node.warn("VAULT_URI = " + nconf.get("VAULT_URI"));
+                node.warn("n.url = " + n.url);
+
                 var baseUrl = (typeof n.url === "undefined" || n.url == "") ? nconf.get("VAULT_URI") : n.url;
+
+                node.warn("baseURL = " + baseUrl);
 
                 var urls = [];
                 for (var i=0; i<node.rules.length; i+=1) {
@@ -271,10 +278,10 @@ module.exports = function(RED) {
                 async.each(urls, function (url, callback) {
                     doRequest (node, msg, url, tlsNode, callback);
                 }, function (err) {
-                    node.send(msg);
+                    node.error("Async catch error - " + err);
                 });
             } catch(err) {
-                node.warn(err);
+                node.error("Catch all error - " + err);
             }
         });
 
