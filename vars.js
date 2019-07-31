@@ -99,6 +99,7 @@ module.exports = function(RED) {
                     });
                 }, 10);                
               }
+              callback("Error getting data");
             } else {
 
               if (node.metric()) {
@@ -114,6 +115,7 @@ module.exports = function(RED) {
 
               if (response.statusCode != 200) {
                   msg.missing.push(rule.cv + ':' + rule.v);
+                  callback("Missing Data");
               } else {
                   if (rule.t == "keyvalue") {
 
@@ -163,10 +165,10 @@ module.exports = function(RED) {
                           msg.envs[key + "_" + fkey] = data[e];
                       });
                   }
-              }
+                  callback();
+                }
               //node.warn("Finished request for " + rule.v);
             }
-            callback();
         });
 
     }
