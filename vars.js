@@ -91,11 +91,10 @@ module.exports = function(RED) {
                 node.error(error, msg);
                 //msg.payload = error.toString() + " : " + url;
                 //msg.statusCode = error.code;
-                node.send(msg);
                 node.status({
                   fill: "red",
                   shape: "ring",
-                  text: error.code
+                  text: "Error - " + error.statusCode
                 });
               }
             } else {
