@@ -18,11 +18,11 @@ var request = require('request');
 var async = require('async');
 var nconf = require('nconf');
 
+nconf.defaults({VAULT_URI: ""}).env().argv();
 
 module.exports = function(RED) {
     "use strict";
 
-    nconf.defaults({VAULT_URI: ""}).env().argv();
 
     var operators = {
         'eq': function(a, b) { return a == b; },
