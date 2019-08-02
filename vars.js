@@ -55,18 +55,19 @@ module.exports = function(RED) {
             opts.headers['X-Vault-Token'] = msg.req.headers['x-vault-token']
         }
 
+        var tenantPrefix = ""
         if (msg.req && msg.req.headers.hasOwnProperty('x-tenant-id')) {
-            opts.headers['X-Tenant-ID'] = msg.req.headers['x-tenant-id']
+            tenantPrefix = "tenants/" + msg.req.headers['x-tenant-id'] + "/"
         }
         
         var rule = url.rule;
 
         if (rule.t == "keyvalue") {
-            opts['url'] = url.url + "v1/kv/" + rule.v;
+            opts['url'] = url.url + "v1/kv/" + tenantPrefix + rule.v;
         } else if (rule.t == "service") {
             opts['url'] = url.url + "v1/catalog/service/" + rule.v;
         } else {
-            opts['url'] = url.url + "v1/secret/" + rule.v;
+            opts['url'] = url.url + "v1/secret/" + tenantPrefix + rule.v;
         }
 
         node.debug("CALLING: " + opts['url']);
